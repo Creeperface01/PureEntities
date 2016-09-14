@@ -11,18 +11,19 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.timings.Timings;
 import milk.pureentities.entity.WalkingEntity;
 import milk.pureentities.entity.monster.walking.Enderman;
 import milk.pureentities.util.Utils;
 
 public abstract class WalkingMonster extends WalkingEntity implements Monster{
 
-    protected int[] minDamage;
-    protected int[] maxDamage;
+    private int[] minDamage;
+    private int[] maxDamage;
 
     protected int attackDelay = 0;
 
-    protected boolean canAttack = true;
+    private boolean canAttack = true;
 
     public WalkingMonster(FullChunk chunk, CompoundTag nbt){
         super(chunk, nbt);
@@ -137,6 +138,10 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster{
     }
 
     public boolean onUpdate(int currentTick){
+        if(this.closed){
+            return false;
+        }
+
         if(this.server.getDifficulty() < 1){
             this.close();
             return false;
@@ -156,7 +161,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster{
 
         Vector3 target = this.updateMove(tickDiff);
         if(
-            ((this.isFriendly() && !(target instanceof Player)) || !this.isFriendly())
+            (!this.isFriendly() || !(target instanceof Player))
             && target instanceof Entity
         ){
             if(target != this.followTarget || this.canAttack){
@@ -170,7 +175,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster{
 
     @Override
     public boolean entityBaseTick(int tickDiff){
-        //Timings.timerEntityBaseTick.startTiming();
+        Timings.entityBaseTickTimer.startTiming();
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
@@ -194,7 +199,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster{
             }
         }
 
-        //Timings.timerEntityBaseTick.stopTiming();
+        Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
 

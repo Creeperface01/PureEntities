@@ -59,6 +59,10 @@ public class Blaze extends FlyingMonster{
             return;
         }
 
+        if(this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()){
+            return;
+        }
+
         Vector3 target = this.target;
         if(!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))){
             double near = Integer.MAX_VALUE;
@@ -126,16 +130,22 @@ public class Blaze extends FlyingMonster{
 
         int[] sides = {Block.SIDE_SOUTH, Block.SIDE_WEST, Block.SIDE_NORTH, Block.SIDE_EAST};
         Block that = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
+        if(this.getDirection() == null){
+            return false;
+        }
+
         Block block = that.getSide(sides[this.getDirection()]);
         if(
             !block.canPassThrough()
-                && block.getSide(Block.SIDE_UP).canPassThrough()
-                && that.getSide(Block.SIDE_UP, 2).canPassThrough()
-            ){
+            && block.getSide(Block.SIDE_UP).canPassThrough()
+            && that.getSide(Block.SIDE_UP, 2).canPassThrough()
+        ){
             if(block instanceof BlockFence || block instanceof BlockFenceGate){
-                this.motionY = this.getGravity() * 2;
-            }else{
+                this.motionY = this.getGravity();
+            }else if(this.motionY <= this.getGravity() * 4){
                 this.motionY = this.getGravity() * 4;
+            }else{
+                this.motionY += this.getGravity() * 0.25;
             }
             return true;
         }

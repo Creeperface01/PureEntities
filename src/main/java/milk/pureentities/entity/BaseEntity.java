@@ -134,7 +134,7 @@ public abstract class BaseEntity extends EntityCreature{
             this.lastYaw = this.yaw;
             this.lastPitch = this.pitch;
 
-            this.level.addEntityMovement(this.chunk.getX(), this.chunk.getZ(), this.id, this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
+            this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
         }
     }
 
@@ -266,6 +266,9 @@ public abstract class BaseEntity extends EntityCreature{
         }
 
         super.attack(source);
+
+        this.target = null;
+        this.attackTime = 7;
     }
 
     @Override

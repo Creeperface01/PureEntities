@@ -11,7 +11,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.nbt.tag.CompoundTag;
-import milk.pureentities.entity.animal.WalkingAnimal;
+import milk.pureentities.entity.animal.Animal;
 import milk.pureentities.util.Utils;
 
 public abstract class WalkingEntity extends BaseEntity{
@@ -25,12 +25,16 @@ public abstract class WalkingEntity extends BaseEntity{
             return;
         }
 
+        if(this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()){
+            return;
+        }
+
         Vector3 target = this.target;
         if(!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))){
             double near = Integer.MAX_VALUE;
 
             for(Entity entity : this.getLevel().getEntities()){
-                if(entity == this || !(entity instanceof EntityCreature) || entity instanceof WalkingAnimal){
+                if(entity == this || !(entity instanceof EntityCreature) || entity instanceof Animal){
                     continue;
                 }
 
@@ -93,6 +97,10 @@ public abstract class WalkingEntity extends BaseEntity{
 
         int[] sides = {Block.SIDE_SOUTH, Block.SIDE_WEST, Block.SIDE_NORTH, Block.SIDE_EAST};
         Block that = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
+        if(this.getDirection() == null){
+            return false;
+        }
+
         Block block = that.getSide(sides[this.getDirection()]);
         if(
             !block.canPassThrough()
@@ -100,9 +108,11 @@ public abstract class WalkingEntity extends BaseEntity{
             && that.getSide(Block.SIDE_UP, 2).canPassThrough()
         ){
             if(block instanceof BlockFence || block instanceof BlockFenceGate){
-                this.motionY = this.getGravity() * 2;
-            }else{
+                this.motionY = this.getGravity();
+            }else if(this.motionY <= this.getGravity() * 4){
                 this.motionY = this.getGravity() * 4;
+            }else{
+                this.motionY += this.getGravity() * 0.25;
             }
             return true;
         }
