@@ -60,7 +60,7 @@ public abstract class WalkingEntity extends BaseEntity{
         }
 
         int x, z;
-        if(this.stayTime > 0){
+        if(this.stayTime <= 0){
             if(Utils.rand(1, 100) > 5){
                 return;
             }
