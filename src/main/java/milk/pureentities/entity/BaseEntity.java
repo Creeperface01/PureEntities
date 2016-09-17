@@ -142,9 +142,9 @@ public abstract class BaseEntity extends EntityCreature{
         if(this instanceof Monster){
             if(creature instanceof Player){
                 Player player = (Player) creature;
-                return !player.closed && player.spawned && player.isAlive() && player.isSurvival() && distance <= 100;
+                return !player.closed && player.spawned && player.isAlive() && player.isSurvival() && distance <= 16;
             }
-            return creature.isAlive() && !creature.closed && distance <= 81;
+            return creature.isAlive() && !creature.closed && distance <= 16;
         }
         return false;
     }
